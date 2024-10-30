@@ -47,6 +47,8 @@ const shortUsage = `Usage of mkcert:
 `
 
 const advancedUsage = `Advanced options:
+	-validity
+	    Set the certificate's duration in days, defaulting to 825.
 
 	-cert-file FILE, -key-file FILE, -p12-file FILE
 	    Customize the output paths.
@@ -103,6 +105,10 @@ func main() {
 		keyFileFlag   = flag.String("key-file", "", "")
 		p12FileFlag   = flag.String("p12-file", "", "")
 		versionFlag   = flag.Bool("version", false, "")
+
+		// 825 days, the limit that macOS/iOS apply to all certificates,
+		// including custom roots. See https://support.apple.com/en-us/HT210176.
+		validityFlag  = flag.Int("validity", 825, "Validity duration of the certificate in days")
 	)
 	flag.Usage = func() {
 		fmt.Fprint(flag.CommandLine.Output(), shortUsage)
@@ -146,6 +152,7 @@ func main() {
 		installMode: *installFlag, uninstallMode: *uninstallFlag, csrPath: *csrFlag,
 		pkcs12: *pkcs12Flag, ecdsa: *ecdsaFlag, client: *clientFlag,
 		certFile: *certFileFlag, keyFile: *keyFileFlag, p12File: *p12FileFlag,
+		validity: *validityFlag,
 	}).Run(flag.Args())
 }
 
@@ -157,6 +164,7 @@ type mkcert struct {
 	pkcs12, ecdsa, client      bool
 	keyFile, certFile, p12File string
 	csrPath                    string
+	validity                   int
 
 	CAROOT string
 	caCert *x509.Certificate
