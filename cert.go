@@ -164,10 +164,7 @@ func (m *mkcert) generateKey(rootCA bool) (crypto.PrivateKey, error) {
 	if m.ecdsa {
 		return ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	}
-	if rootCA {
-		return rsa.GenerateKey(rand.Reader, 3072)
-	}
-	return rsa.GenerateKey(rand.Reader, 2048)
+	return rsa.GenerateKey(rand.Reader, 4096)
 }
 
 func (m *mkcert) fileNames(hosts []string) (certFile, keyFile, p12File string) {
