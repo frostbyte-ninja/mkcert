@@ -57,6 +57,9 @@ const advancedUsage = `Advanced options:
 	-ecdsa
 	    Generate a certificate with an ECDSA key.
 
+	-rsa-key-size
+	    Set the RSA key size in bits, defaulting to 4096.
+
 	-pkcs12
 	    Generate a ".p12" PKCS #12 file, also know as a ".pfx" file,
 	    containing certificate and key for legacy applications.
@@ -103,6 +106,9 @@ func main() {
 		keyFileFlag   = flag.String("key-file", "", "")
 		p12FileFlag   = flag.String("p12-file", "", "")
 		versionFlag   = flag.Bool("version", false, "")
+
+		// RSA key size (in bits) used when not generating ECDSA keys.
+		rsaKeySizeFlag = flag.Int("rsa-key-size", 4096, "RSA key size in bits")
 	)
 	flag.Usage = func() {
 		fmt.Fprint(flag.CommandLine.Output(), shortUsage)
@@ -146,6 +152,7 @@ func main() {
 		installMode: *installFlag, uninstallMode: *uninstallFlag, csrPath: *csrFlag,
 		pkcs12: *pkcs12Flag, ecdsa: *ecdsaFlag, client: *clientFlag,
 		certFile: *certFileFlag, keyFile: *keyFileFlag, p12File: *p12FileFlag,
+		rsaKeySize: *rsaKeySizeFlag,
 	}).Run(flag.Args())
 }
 
@@ -157,6 +164,7 @@ type mkcert struct {
 	pkcs12, ecdsa, client      bool
 	keyFile, certFile, p12File string
 	csrPath                    string
+	rsaKeySize                 int
 
 	CAROOT string
 	caCert *x509.Certificate

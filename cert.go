@@ -52,7 +52,7 @@ func (m *mkcert) makeCert(hosts []string) {
 		log.Fatalln("ERROR: can't create new certificates because the CA key (rootCA-key.pem) is missing")
 	}
 
-	priv, err := m.generateKey(false)
+	priv, err := m.generateKey()
 	fatalIfErr(err, "failed to generate certificate key")
 	pub := priv.(crypto.Signer).Public()
 
@@ -163,14 +163,11 @@ func (m *mkcert) printHosts(hosts []string) {
 	}
 }
 
-func (m *mkcert) generateKey(rootCA bool) (crypto.PrivateKey, error) {
+func (m *mkcert) generateKey() (crypto.PrivateKey, error) {
 	if m.ecdsa {
 		return ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	}
-	if rootCA {
-		return rsa.GenerateKey(rand.Reader, 3072)
-	}
-	return rsa.GenerateKey(rand.Reader, 2048)
+	return rsa.GenerateKey(rand.Reader, m.rsaKeySize)
 }
 
 func (m *mkcert) fileNames(hosts []string) (certFile, keyFile, p12File string) {
@@ -308,7 +305,7 @@ func (m *mkcert) loadCA() {
 }
 
 func (m *mkcert) newCA() {
-	priv, err := m.generateKey(true)
+	priv, err := m.generateKey()
 	fatalIfErr(err, "failed to generate the CA key")
 	pub := priv.(crypto.Signer).Public()
 
